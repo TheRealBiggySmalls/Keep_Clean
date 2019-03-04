@@ -85,8 +85,9 @@ public class ScenarioManager : MonoBehaviour {
 			buttons.onClick.AddListener(delegate{StartTutorial();}); //starts tutorial if this is "Start" game and not "Load"
 		}
 
+		buttons.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
+		//buttons.onClick.AddListener(delegate{load.GetComponentInChildren<Scenario>().setFade(true);});
 		buttons.onClick.AddListener(delegate{Destroy(load);});
-
 		load.transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
 		load.transform.localScale=Vector3.one;
 		//Setting position to be correct
@@ -99,6 +100,7 @@ public class ScenarioManager : MonoBehaviour {
 		GameObject load  = (GameObject) Instantiate(instance.tutorial);
 		Button buttons = load.GetComponentInChildren<Button>();
 
+		buttons.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		buttons.onClick.AddListener(delegate{Destroy(load);});
 
 		load.transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
@@ -110,16 +112,10 @@ public class ScenarioManager : MonoBehaviour {
 	}
 
 	public static void ChooseEvent(Hex hex, int id = 0, bool end=false){
-		//if(instance.boi==null){
-		//	instance.boi=hex.hexMap.player;
-		//}
 
 		int rand;
 		if(id==0){
-			//Pick a random event!
-			//change this to 30 later. Just using now so it doesnt break
 			rand = (int) Random.Range(1,12);
-			Debug.Log(rand);
 		}else{
 			rand = id;
 		}
@@ -131,6 +127,8 @@ public class ScenarioManager : MonoBehaviour {
 	public static void GameOver(){
 		GameObject gameOver  = (GameObject) Instantiate(instance.deathPrefab);
 
+		AudioManager.audioManager.playSound("death");
+
 		Button[] buttons = gameOver.GetComponentsInChildren<Button>();
 		if(buttons[0].name=="OptionOne"){
 			buttons[0].onClick.AddListener(delegate{TurnOrganiser.turnOrg.LoadAllData();});
@@ -139,6 +137,8 @@ public class ScenarioManager : MonoBehaviour {
 			buttons[1].onClick.AddListener(delegate{TurnOrganiser.turnOrg.LoadAllData();});
 			buttons[0].onClick.AddListener(delegate{TurnOrganiser.turnOrg.startFresh();});
 		}
+		buttons[1].onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
+		buttons[0].onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		buttons[1].onClick.AddListener(delegate{Destroy(gameOver);});
 		buttons[0].onClick.AddListener(delegate{Destroy(gameOver);});
 
@@ -177,6 +177,8 @@ public class ScenarioManager : MonoBehaviour {
 			buttons[0].GetComponentInChildren<Text>().text = OptionTwo;
 			buttons[1].GetComponentInChildren<Text>().text = OptionOne;
 		}
+		buttons[0].onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
+		buttons[1].onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		tileEvent.transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
 		tileEvent.transform.localScale=Vector3.one;
 
@@ -204,6 +206,8 @@ public class ScenarioManager : MonoBehaviour {
 			buttons[0].GetComponentInChildren<Text>().text = OptionTwo;
 			buttons[1].GetComponentInChildren<Text>().text = OptionOne;
 		}
+		//buttons[0].onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});//probably not necessary here
+		//buttons[1].onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 	}
 
 	public static void DisplayResults(int option){
@@ -227,6 +231,7 @@ public class ScenarioManager : MonoBehaviour {
 			}
 			//sets button text
 			outcome.GetComponentInChildren<Button>().GetComponentInChildren<Text>().text = CloseText;
+			outcome.GetComponentInChildren<Button>().onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 
 
 			outcome.transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
@@ -259,6 +264,7 @@ public class ScenarioManager : MonoBehaviour {
 		
 			//sets button text
 			outcome.GetComponentInChildren<Button>().GetComponentInChildren<Text>().text = CloseText;
+			outcome.GetComponentInChildren<Button>().onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 
 
 			outcome.transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
@@ -297,6 +303,7 @@ public class ScenarioManager : MonoBehaviour {
 
 			//sets button text
 			outcome.GetComponentInChildren<Button>().GetComponentInChildren<Text>().text = CloseText;
+			outcome.GetComponentInChildren<Button>().onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 
 			outcome.transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
 			outcome.transform.localScale=Vector3.one;
@@ -346,6 +353,7 @@ public class ScenarioManager : MonoBehaviour {
 		
 		//sets button text
 		outcome.GetComponentInChildren<Button>().GetComponentInChildren<Text>().text = CloseText;
+		outcome.GetComponentInChildren<Button>().onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 
 		outcome.transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
 		outcome.transform.localScale=Vector3.one;
@@ -355,6 +363,7 @@ public class ScenarioManager : MonoBehaviour {
 		outcome.transform.position = defaultPos;
 
 		Character.storyTriggered=false; //reset this
+
 	}
 
 
@@ -2000,6 +2009,7 @@ public class ScenarioManager : MonoBehaviour {
 					boi.highlightStory(boi.storyProgress,boi.storyProgress-1);
 					HappinessMeter.meter.GetComponentInChildren<HappinessMeter>().fillMeter(Random.Range(15,25));
 					EndStoryEvent(scenarioOneTexture);
+					AudioManager.audioManager.playSound("story");
 				}else{
 					EventText = "You release some bees and they stay still for a second, confused, before all spreading off in different directions... Their efforts are fruitless. Perhaps specific kinds of bees will be better for certain tasks...";
 					CloseText = "Chaos.";
@@ -2107,6 +2117,7 @@ public class ScenarioManager : MonoBehaviour {
 					boi.highlightStory(boi.storyProgress,boi.storyProgress-1);
 					HappinessMeter.meter.GetComponentInChildren<HappinessMeter>().fillMeter(Random.Range(14,20));
 					EndStoryEvent(scenarioTwoTexture);
+					AudioManager.audioManager.playSound("story");
 				}else{
 					OptionOne="You stand over what you believe to be the source of what the warriors were protecting but can see nothing, it looks exceptionally ordinary to you. You can hear a malevolent buzzing on the horizon and decide to moved on before it returns for vengeance!";
 					CloseText = "Hmm...";
@@ -2246,6 +2257,7 @@ public class ScenarioManager : MonoBehaviour {
 					boi.storyProgress+=1;
 					HappinessMeter.meter.GetComponentInChildren<HappinessMeter>().fillMeter(Random.Range(-2,-5));
 					boi.highlightStory(boi.storyProgress,boi.storyProgress-1);
+					AudioManager.audioManager.playSound("story");
 				}else{
 					EventText = "You follow the noise through the lengths of the dingy cave. It shrinks and twists, being barely able to crawl through until... LIGHT! You emerge from the cave and find yourself outside again, peacefully resting on the beach...";
 					CloseText = "Hmm";
@@ -2430,6 +2442,7 @@ public class ScenarioManager : MonoBehaviour {
 					boi.storyProgress+=1;
 					HappinessMeter.meter.GetComponentInChildren<HappinessMeter>().fillMeter(Random.Range(-35,-55));
 					boi.highlightStory(boi.storyProgress,boi.storyProgress-1);
+					AudioManager.audioManager.playSound("story");
 				}else{
 					EventText = "Your most naturally attuned bees float around the alter in confusion. After some time they return to you, perplexed and visibly upset...";
 					CloseText = "Let us leave, friends.";
@@ -2535,6 +2548,7 @@ public class ScenarioManager : MonoBehaviour {
 				boi.storyProgress+=1;
 				HappinessMeter.meter.GetComponentInChildren<HappinessMeter>().fillMeter(100);
 				boi.highlightStory(boi.storyProgress,boi.storyProgress-1);
+				AudioManager.audioManager.playSound("story");
 			}else if(option==2){
 				EventText="As you turn away and leave that accursed place you can feel you psyche lifted... You are confident you made the right choice, and are happy you get to focus on your true passion, beekeeping. For one must remember not to live their life through the past of another...";
 				CloseText = "I am happy";
@@ -2546,6 +2560,7 @@ public class ScenarioManager : MonoBehaviour {
 
 	public static void CreateDisasterousEvent(){
 
+		AudioManager.audioManager.playSound("weird");
 		int rand = (int)Random.Range(0,3.99f);
 
 		if(rand==0){ //food and water are erased
@@ -2606,6 +2621,7 @@ public class ScenarioManager : MonoBehaviour {
 		
 		//sets button text
 		outcome.GetComponentInChildren<Button>().GetComponentInChildren<Text>().text = "Oh no...";
+		outcome.GetComponentInChildren<Button>().onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 
 
 		outcome.transform.SetParent(GameObject.FindGameObjectWithTag("Canvas").transform);
@@ -2638,6 +2654,7 @@ public class ScenarioManager : MonoBehaviour {
 			if(item.uniqueName=="hole"){
 				item.activated=true; 
 				obj.GetComponentInChildren<Button>().onClick.AddListener(delegate{instance.dimensionalRipClick();}); //adds onclick
+				obj.GetComponentInChildren<Button>().onClick.AddListener(delegate{AudioManager.audioManager.playSound("weird");});
 				instance.backpack.updateTextures(); 
 				instance.backpack.createDict();
 			}
@@ -2663,6 +2680,7 @@ public class ScenarioManager : MonoBehaviour {
 		GameObject gameOver  = (GameObject) Instantiate(instance.endGame);
 
 		Button button = gameOver.GetComponentInChildren<Button>();
+		button.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		button.onClick.AddListener(delegate{Destroy(gameOver);});
 		button.onClick.AddListener(delegate{TurnOrganiser.turnOrg.startFresh();});
 

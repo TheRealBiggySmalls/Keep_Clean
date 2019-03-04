@@ -242,6 +242,8 @@ public class ApiaryOrganiser : MonoBehaviour {
 			apiaryDoneText.enabled=false;
 		}
 		apiaryWindow.SetActive(true);
+		AudioManager.audioManager.playSound("invopen");
+
 	}
 
 
@@ -250,6 +252,8 @@ public class ApiaryOrganiser : MonoBehaviour {
 		disableHoney();
 		toolTip.SetActive(false);
 		apiaryWindow.SetActive(false);
+		AudioManager.audioManager.playSound("invclose");
+
 	}
 
 	public void disableHoney(){
@@ -336,10 +340,13 @@ public class ApiaryOrganiser : MonoBehaviour {
 		beeSlotTwo = tiles[offset +3];
 		resultOne= tiles[offset +4];
 		resultOneButton = resultOne.GetComponentInChildren<Button>();
+		resultOneButton.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		resultTwo=tiles[offset +5];
 		resultTwoButton = resultTwo.GetComponentInChildren<Button>();
+		resultTwoButton.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		resultThree=tiles[offset +6];
 		resultThreeButton = resultThree.GetComponentInChildren<Button>();
+		resultThreeButton.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		honeyResultText = tiles[tiles.Length-1];
 		Image[] gm = apiaryWindow.GetComponentsInChildren<Image>();
 		toolTip = gm[gm.Length-1].gameObject;
@@ -351,6 +358,7 @@ public class ApiaryOrganiser : MonoBehaviour {
 	public void initBees(){
 		foreach(GameObject bee in bees) { 
 			bee.GetComponentInChildren<Button>().onClick.AddListener(delegate{addBeeToApaiary(bee);});
+			bee.GetComponentInChildren<Button>().onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 			
 			Bee component = bee.GetComponentInChildren<Bee>();
 			component.beeObject=bee;

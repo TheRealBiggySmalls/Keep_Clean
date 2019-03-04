@@ -90,7 +90,6 @@ public class Map : MonoBehaviour {
 
 	public Hex GetHexAt(int x, int y){
 		if(hexes == null){
-			Debug.LogError("Hexes not instantiated");
 			return null;
 		}
 		if(allowWrapEastWest){
@@ -110,7 +109,6 @@ public class Map : MonoBehaviour {
 		try{
 			return hexes[x,y];
 		}catch{
-			Debug.LogError("GetHexAt: "+x + "," + y);
 			return null;
 		}
 	}

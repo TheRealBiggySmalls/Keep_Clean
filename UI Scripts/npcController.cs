@@ -49,7 +49,7 @@ public class npcController : MonoBehaviour {
 	}
 
 	public void initNpc(bool first){
-
+		AudioManager.audioManager.playSound("npc");
 		//dont need this if, even though it is there for safety
 		if(first){
 			instance = Instantiate(npcStartPrefab);
@@ -60,6 +60,7 @@ public class npcController : MonoBehaviour {
 		//finds button and sets onclick
 		startButton = instance.GetComponentInChildren<Button>();
 		startButton.onClick.AddListener(delegate{introRoutine(1);});
+		startButton.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		//finds text
 		startText = instance.GetComponentsInChildren<Text>()[1];
 
@@ -69,7 +70,7 @@ public class npcController : MonoBehaviour {
 	}
 
 	public void openNpcScreen(bool comeFromStart){
-		numberOfRumours=0;
+		numberOfRumours=0; lastRumour=0;
 		if(instance){
 			Destroy(instance);
 		}
@@ -80,7 +81,9 @@ public class npcController : MonoBehaviour {
 		shopButton = instance.GetComponentsInChildren<Button>()[0];
 		rumourButton = instance.GetComponentsInChildren<Button>()[1];
 		shopButton.onClick.AddListener(delegate{openShopScreen();});
+		shopButton.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		rumourButton.onClick.AddListener(delegate{pickRumour(1);});
+		rumourButton.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 
 		//get text object
 		dialogueText = instance.GetComponentsInChildren<Text>()[2];
@@ -106,6 +109,7 @@ public class npcController : MonoBehaviour {
 		
 		//gets exit button and assigns onclick
 		exit = instance.GetComponentInChildren<Button>();
+		exit.onClick.AddListener(delegate{AudioManager.audioManager.playSound("button");});
 		exit.onClick.AddListener(delegate{CloseNpc();});
 
 		//gets shop slots as images and inits their buttons
@@ -143,6 +147,7 @@ public class npcController : MonoBehaviour {
 
 	public void endShopKeeper(){
 		instance = Instantiate(endPrefab);
+		instance.GetComponentInChildren<Button>().onClick.AddListener(delegate{AudioManager.audioManager.playSound("invclose");});
 		instance.GetComponentInChildren<Button>().onClick.AddListener(delegate{Destroy(instance);});
 		positionCorrect(instance);
 	}	
@@ -191,7 +196,6 @@ public class npcController : MonoBehaviour {
 		for(int i=0;i<toGenerate;i++){
 			
 			int item = generateItem();
-			Debug.Log(allItems[item].type);
 			//regenerates duplicates 
 			int count=0;
 			while(true){ 
@@ -257,21 +261,20 @@ public class npcController : MonoBehaviour {
 	
 		//check honeyCost
 		if(item.tempCost>player.Honey){
-			Debug.Log("insufficient honey to purchase!");
 			return;
 		}
 
 		//remove cost from honey
 		player.UpdateResources(0,0,-item.tempCost);
+
+		AudioManager.audioManager.playSound("buy");
 		
 		//add item to inventory
 		if(item.type=="resource"){ //FOR FOOD AND WATER
 			if(item.identifier=="MelonWater"){
 				player.UpdateResources(item.tempQuantity,0,0);
-				Debug.Log("BOUGHT" + item.identifier);
 			}else if(item.identifier=="Stein"){
 				player.UpdateResources(0,item.tempQuantity,0);
-				Debug.Log("BOUGHT" + item.identifier);
 			}
 			regenerateCosts(item, slot);
 		}else if(item.type=="bee"){ //FOR BEE
@@ -280,15 +283,13 @@ public class npcController : MonoBehaviour {
 					if(bee.GetComponentInChildren<Bee>().quantity<0){
 						bee.GetComponentInChildren<Bee>().quantity=0;
 					}
-					apiary.GetComponentInChildren<ApiaryOrganiser>().addToBeeQuantity(item.texture, item.tempQuantity);
+					ApiaryOrganiser.apiaryOrg.addToBeeQuantity(item.texture, item.tempQuantity);
 					break;
 				}
-				Debug.Log("BOUGHT" + item.identifier);
 			}
 			regenerateCosts(item, slot);
 		}else if(item.type=="unique"){//FOR UNIQUES
 			buyUniqueItem(item.identifier);
-			Debug.Log("BOUGHT" + item.identifier);
 			updateSlotTextures(slot);
 		}
 		
@@ -354,7 +355,7 @@ public class npcController : MonoBehaviour {
 	}
 
 	//onClick for rumour button. Should use enums but meh
-	int numberOfRumours;
+	int numberOfRumours; int lastRumour=0;
 	public void pickRumour(int number){
 		//TODO: implement some feature so rumours that have been displayed can be tracked
 		//for now 1 is passed. Find a way to count or similar later
@@ -364,7 +365,93 @@ public class npcController : MonoBehaviour {
 			return;
 		} //catch block so only a few rumours can be accessed at a time
 
-		int rand = (int)Random.Range(0,22.99f); //CAN MA
+		int rand = (int)Random.Range(0,4.99f); //CAN MA
+		//pool of 5 rumours: 3 are progression specific, 2 are general
+		while(rand!=lastRumour){
+			rand = (int)Random.Range(0,4.99f); 
+		}
+
+		if(rand==1||rand==2||rand==3){
+			chooseHintRumour(rand);
+			lastRumour = rand;
+		}else{
+			chooseRegularRumour();
+		}
+	}
+
+	public void chooseHintRumour(int rand){
+		
+		if(!ApiaryOrganiser.apiaryOrg.beeTruth["worker"]||!ApiaryOrganiser.apiaryOrg.beeTruth["plains"]){
+			if(rand==1){
+				dialogueText.text = "In my experience common bees have a high chance to mutate within their own species. Try putting two in together!";
+			}else if(rand==2){
+				dialogueText.text = "Bland bees are quite boring in my experience. Unpopular opinion...";
+			}else if(rand==3){
+				dialogueText.text = "As you get more and more species the traits they possess will become more complex.";
+			}
+		}else if(ApiaryOrganiser.apiaryOrg.beeTruth["nice"]&&!ApiaryOrganiser.apiaryOrg.beeTruth["stone"]){
+			if(rand==1){
+				dialogueText.text = "Have you explored the mountains? Who knows what hides way up there...";
+			}else if(rand==2){
+				dialogueText.text = "Many miners used to live up in those mountains once upon a time... might be worth taking some such equipment with yourself!";
+			}else if(rand==3){
+				dialogueText.text = "You might be able to get better cross-breeding results by checking your journal for hints!";
+			}
+		}else if(ApiaryOrganiser.apiaryOrg.beeTruth["plains"]&&!ApiaryOrganiser.apiaryOrg.beeTruth["icy"]){
+			if(rand==1){
+				dialogueText.text = "I love exploring ice caves and running through the snow! I always bring my plain bees with me too - they seem drawn to icy areas oddly enough.";
+			}else if(rand==2){
+				dialogueText.text = "There is some great scenery up in the mountains! Heard of some miners long ago who would return with mysterious packages too...";
+			}else if(rand==3){
+				dialogueText.text = "I love taking my robot friend with me on expeditions - he always makes me feel much better about myself!";
+			}
+		}else if(ApiaryOrganiser.apiaryOrg.beeTruth["forest"]&&!ApiaryOrganiser.apiaryOrg.beeTruth["shore"]){
+			if(rand==1){
+				dialogueText.text = "Have you been to many of the coasts around the island? There sure are some fantastic nooks!";
+			}else if(rand==2){
+				dialogueText.text = "They should call this place 'Squeaky Island'! I haven't found a beach yet without that insufferable sand";
+			}else if(rand==3){
+				dialogueText.text = "Your shoes are looking old...";
+			}
+		}else if(!ApiaryOrganiser.apiaryOrg.beeTruth["forest"]&&ApiaryOrganiser.apiaryOrg.beeTruth["shore"]){
+			if(rand==1){
+				dialogueText.text = "The forest is a great place for finding new species of bees - it is teeming with life!";
+			}else if(rand==2){
+				dialogueText.text = "I picked a rose from the forest a very long time ago and it still looks like it hasn't aged a day...";
+			}else if(rand==3){
+				dialogueText.text = "Be careful around the forest - it is a very magical but very strange place. One must not underestimate it...";
+			}
+		}else if(ApiaryOrganiser.apiaryOrg.beeTruth["ocean"]&&ApiaryOrganiser.apiaryOrg.beeTruth["warrior"]){
+			if(rand==1){
+				dialogueText.text = "Ocean bees sure do have a way with more aggressive species. I've seen five or six pacify a whole hive!";
+			}else if(rand==2){
+				dialogueText.text = "Warrior species are usually a menace, but I've heard of certain beekeepers who have been able to nullify their traits by cross breeding.";
+			}else if(rand==3){
+				dialogueText.text = "I love my dingy! Though the Ocean sure can be boring...";
+			}
+		}else if(ApiaryOrganiser.apiaryOrg.beeTruth["magic"]&&ApiaryOrganiser.apiaryOrg.beeTruth["mutant"]){
+			if(rand==1){
+				dialogueText.text = "I'm not sure I like the look of those green and purple bees you've got there... they seem mighty unnatural.";
+			}else if(rand==2){
+				dialogueText.text = "Phew something stinks!";
+			}else if(rand==3){
+				dialogueText.text = "Those purple bees sure are something else! You're the first one outside of myself to ever aquire some!";
+			}
+		}else if(ApiaryOrganiser.apiaryOrg.beeTruth["diligent"]||ApiaryOrganiser.apiaryOrg.beeTruth["intelligent"]){
+			if(rand==1){
+				dialogueText.text = "Be careful with higher tier bees... if you can't find information on them in your journal they may be dangerous...";
+			}else if(rand==2){
+				dialogueText.text = "I've never seen bees like your ones that glow... j-just make sure you know what youre doing!";
+			}else if(rand==3){
+				dialogueText.text = "Heard some tragic stories of beekeepers whose lives were reduced to ruin due to a lack of preperation...";
+			}
+		}else{
+			chooseRegularRumour();
+		}
+	}
+
+	public void chooseRegularRumour(){
+		int rand=(int)Random.Range(0,22.99f);
 		if(rand==1){
 			dialogueText.text = "Even at sea I've heard strange buzzing at night.";
 		}else if(rand==2){
@@ -387,7 +474,7 @@ public class npcController : MonoBehaviour {
 			dialogueText.text = "I used to visit another island close to here but recently I haven't been able to find it. It's as if the whole place has sunk!";
 		}else if(rand==10){
 			dialogueText.text = "Be sure to get the Bee-Compendium if you can! It is a must have for all budding bee keepers!";
-			if(!backpack.itemTruth["shop"]){
+			if(!backpack.itemTruth["book"]){
 				Journal.addStringToRumoursPage("Be sure to get the Bee-Compendium if you can! It is a must have for all budding bee keepers!", "shop");
 			}
 		}else if(rand==11){
@@ -421,9 +508,7 @@ public class npcController : MonoBehaviour {
 		}else if(rand==22){
 			dialogueText.text = "Be sure to spend your honey wisely! Common bees won't generate very much in the apiary.";
 		}
-
 	}
-
 
 	//used in start to init all items
 	public void initAllItems(){

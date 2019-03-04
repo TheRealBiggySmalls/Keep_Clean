@@ -68,11 +68,9 @@ public class Journal : MonoBehaviour {
 			//<<<-------------LOADING DATA--------------->>>
 			//REMOVE ALL RUMOURS FROM THE PAGE CURRENTLY
 			foreach(GameObject obj in j.rumours){
-				Debug.Log(obj.name);
 				obj.SetActive(false);
 			}//reset rumours then RE-SET them
 			foreach(KeyValuePair<string,string> pair in data.rumours){
-				Debug.Log(pair.Key + " , " + pair.Value);
 				addStringToRumoursPage(pair.Key, pair.Value);
 			}
 			//<<<-------------END OF LOADING DATA--------------->>>
@@ -91,12 +89,18 @@ public class Journal : MonoBehaviour {
 			tab.GetComponentInChildren<Image>().sprite = inactiveTexture;
 			tab.GetComponentInChildren<Text>().color = Color.white;
 		}
+		AudioManager.audioManager.playSound("invopen");
 	}
 
 	public void enableJournalWindow(bool enable){
 		journal.SetActive(enable);
 		updateStoryContent();
 		updateBeeContent();
+		if(enable){
+			AudioManager.audioManager.playSound("invopen");
+		}else{
+			AudioManager.audioManager.playSound("invclose");
+		}
 	}
 	//should set content active by default when clicked
 
@@ -146,7 +150,7 @@ public class Journal : MonoBehaviour {
 		Texture texture=null;
 
 		if(player==null){
-			player=GameObject.Find("Map").GetComponentInChildren<Map_Continent>().player;
+			player=Map.map.player;
 		}
 
 		for(int i=0;i<=4;i++){
@@ -160,7 +164,7 @@ public class Journal : MonoBehaviour {
 					textVariable="'I have been reading some old texts and believe there exists strange and extravagent species with wild talents. I have been ridiculed by my peers, but have heard of another such as myself near the industrial district...'";
 					texture=two;
 				}else if(i==2){
-					textVariable="'Disaster has struck my friend down! After weeks of experimentation we were able to create a marvelous bee, but at a great cost. I need to continue my research... My aquaintance spoke many times of tomes deep within the castle.'";
+					textVariable="'Disaster has struck my friend down! After weeks of experimentation we were able to create a marvelous bee, but at a great cost. I must continue my research... My friend spoke many times of tomes deep within the castle.'";
 					texture=three;
 				}else if(i==3){
 					textVariable="'I have found what I was looking for... nothing can stop me now... no one can stop me now. My dreams and aspirations will finally be complete! Those fools at the university HAHAHA...'";

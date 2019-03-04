@@ -60,10 +60,7 @@ public class MouseController : MonoBehaviour {
 			lastMouseGroundPlanePosition = CheckHitPos(Input.mousePosition);
 			Update_CurrentFunction();
 
-		}else if(Input.GetMouseButtonUp(1)){//characterSelected!=null && ){
-			//at the moment just want to move character if we are a right click
-			Debug.Log("Updating character movement");
-			//TODO: fix charactermovement updating multiple times
+		}else if(Input.GetMouseButtonUp(1)){
 			Update_CharacterMovement();
 		}
 	}
@@ -77,7 +74,6 @@ public class MouseController : MonoBehaviour {
 		//so the moved to tile counts
 		GameObject hitObject = GetHexHit();
 		if(hitObject==null){
-			Debug.Log("Raycast did not hit a game object: UpdateCharacterMovement");
 			return;
 		}
 
@@ -109,7 +105,7 @@ public class MouseController : MonoBehaviour {
 			CancelUpdateFunction();
 			return;
 		}
-		
+
 		if(Input.GetMouseButtonUp(0)){
 			CancelUpdateFunction();
 			return;
@@ -199,7 +195,6 @@ public class MouseController : MonoBehaviour {
 		RaycastHit hitInfo;
 		if( Physics.Raycast(mouseRay, out hitInfo) ) {
 			GameObject ourHitObject = hitInfo.collider.transform.parent.gameObject;
-			Debug.Log("Raycast hit: " + ourHitObject);
 			return ourHitObject;
 		}
 		return null;

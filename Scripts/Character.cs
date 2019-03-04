@@ -81,7 +81,7 @@ public class Character {
 			return;
 		}
 		if(backpack==null){
-			backpack = GameObject.Find("Canvas").GetComponentInChildren<UniquesBackpack>();
+			backpack = UniquesBackpack.backpack;
 			storyProgress=0;
 		}
 		//set all the variables and stuff when the click happens, then call all the actual moving and updating of stuff here!
@@ -158,6 +158,7 @@ public class Character {
 			}
 		}
 
+		AudioManager.audioManager.playSound("footsteps");
 		ChangeResourceText.UpdateUIResources(Food,Water,Honey);
 		//TODO: play walking animation
 		SetHex(nextHex);

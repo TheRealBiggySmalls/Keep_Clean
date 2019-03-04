@@ -140,7 +140,7 @@ public class TurnOrganiser : MonoBehaviour {
 			File.Delete(Application.persistentDataPath + "/meterData.nut");
 			File.Delete(Application.persistentDataPath + "/journalData.nut");
 		}catch{
-			
+		
 		}
 		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 		//SaveAllData(); //resets the previous saved data
@@ -154,6 +154,14 @@ public class TurnOrganiser : MonoBehaviour {
 	public void fadeOut(GameObject obj){
 		obj.GetComponentInChildren<Image>().canvasRenderer.SetAlpha(1.0f);
 		obj.GetComponentInChildren<Image>().CrossFadeAlpha(0.0f,2.0f,false);
+	}
+	Color startColor, endColor, currentColor;
+	public void fadeAll(GameObject bigDaddy, float time){
+
+		for (int childIndex = 0; childIndex < bigDaddy.transform.childCount; childIndex++){
+            Transform child = gameObject.transform.GetChild(childIndex);           
+            fadeOut(child.gameObject);
+        }
 	}
 }
 

@@ -134,9 +134,11 @@ public class UniquesBackpack : MonoBehaviour {
 
 	public void toggleBackpack(){
 		if(UniquesWindow.activeSelf==true){
+			AudioManager.audioManager.playSound("invclose"); //will probably trigger on game start
 			UniquesWindow.SetActive(false);
 		}else{
 			UniquesWindow.SetActive(true);
+			AudioManager.audioManager.playSound("invopen");
 		}
 	}
 
